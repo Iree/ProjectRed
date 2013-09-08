@@ -845,8 +845,20 @@ public class ComponentStore
     	
     	@Override
     	public void renderModel(Transformation t, int orient) {
-            Transformation t2 = (new Scale(new Vector3(2,1,2))).with(t);
-            Transformation t3 = (new Translation(new Vector3(-4,0,-4).multiply(1/16D))).with(t2);
+            int side=orient>>2;
+            Transformation t2; 
+            Transformation t3; 
+            if (side == 0 || side == 1) {                       // X and Z - Ground or Ceiling
+                t2 = (new Scale(new Vector3(2,1,2)).with(t));
+                t3 = (new Translation(new Vector3(-4,0,-4).multiply(1/16D))).with(t2);
+            } else if (side == 2 || side == 3) {                // Y and Z - North or South wall
+                t2 = (new Scale(new Vector3(2,2,1)).with(t));
+                t3 = (new Translation(new Vector3(-4,-4,0).multiply(1/16D))).with(t2);
+            } else {                                            // X and Z - East or West wall
+                t2 = (new Scale(new Vector3(1,2,2)).with(t));
+                t3 = (new Translation(new Vector3(0,-4,-4).multiply(1/16D))).with(t2);
+            }
+    
             IconTransformation icont = new IconTransformation(busDisplayIcon);
             models[orient].render(t3, icont);
             
