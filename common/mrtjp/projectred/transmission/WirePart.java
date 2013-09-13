@@ -3,7 +3,6 @@ package mrtjp.projectred.transmission;
 import java.util.Arrays;
 
 import mrtjp.projectred.ProjectRedCore;
-import mrtjp.projectred.ProjectRedTransmission;
 import mrtjp.projectred.api.IConnectable;
 import mrtjp.projectred.core.BasicUtils;
 import mrtjp.projectred.core.BasicWireUtils;
@@ -462,10 +461,6 @@ public abstract class WirePart extends TMultiPart implements IConnectable, TFace
 
     public boolean maskConnects(int r) {
         return (connMap & 0x111 << r) != 0;
-    }
-    
-    public boolean maskConnectsToOutside(int r) {
-        return (connMap & 0x011 << r) != 0 && (connMap & 0x100 << r) == 0;
     }
     
     public boolean maskOpen(int r) {

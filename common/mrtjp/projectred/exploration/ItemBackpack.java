@@ -16,6 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
+import net.minecraftforge.oredict.OreDictionary;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -188,7 +189,8 @@ public class ItemBackpack extends Item {
         public final String unlocalname;
         public final int meta = this.ordinal();
         public static final EnumBackpack[] VALID_BP = { WHITE, ORANGE, MAGENTA, LIGHT_BLUE, YELLOW, LIME, PINK, GREY, LIGHT_GREY, CYAN, PURPLE, BLUE, BROWN, GREEN, RED, BLACK };
-
+        public static final String oreDictDefinition = "pr_bag";
+        
         private EnumBackpack(String name, String unlocal) {
             fullname = name;
             unlocalname = unlocal;
@@ -209,6 +211,10 @@ public class ItemBackpack extends Item {
             return new ItemStack(ProjectRedExploration.itemBackpack, i, meta);
         }
 
+        public static void initOreDictDefinitions() {
+            for (EnumBackpack b : EnumBackpack.VALID_BP)
+                OreDictionary.registerOre(oreDictDefinition, b.getItemStack());
+        }
     }
 
 }

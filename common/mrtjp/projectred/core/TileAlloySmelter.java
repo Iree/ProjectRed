@@ -3,7 +3,6 @@ package mrtjp.projectred.core;
 import java.util.Random;
 
 import mrtjp.projectred.ProjectRedCore;
-import mrtjp.projectred.ProjectRedExpansion;
 import mrtjp.projectred.core.BlockBasics.EnumBasics;
 import mrtjp.projectred.core.GuiRestrictedSlot.ISlotCheck;
 import net.minecraft.block.Block;
@@ -87,7 +86,7 @@ public class TileAlloySmelter extends TileBasicsBase implements IInventory {
     @Override
     public boolean onBlockActivated(EntityPlayer player) {
         if (!player.isSneaking()) {
-            player.openGui(ProjectRedExpansion.instance, CoreGuiHandler.alloyID, player.worldObj, xCoord, yCoord, zCoord);
+            player.openGui(ProjectRedCore.instance, CoreGuiHandler.alloyID, player.worldObj, xCoord, yCoord, zCoord);
             return true;
         }
         return false;
@@ -107,7 +106,6 @@ public class TileAlloySmelter extends TileBasicsBase implements IInventory {
         _inv.readFromNBT(nbt);
         heat = nbt.getInteger("heat");
         progress = nbt.getInteger("progress");
-        int index = nbt.getInteger("recipeIndex");
         updateNextTick = true;
     }
 
@@ -279,7 +277,7 @@ public class TileAlloySmelter extends TileBasicsBase implements IInventory {
     public void updateWatchers() {
         if (BasicUtils.isClient(worldObj))
             return;
-        PacketCustom packet = new PacketCustom(CoreCPH.channel, CoreProxy.alloySmelterWatcherUpdate);
+        PacketCustom packet = new PacketCustom(CoreCPH.channel, CoreCPH.alloySmelterWatcherUpdate);
         packet.writeCoord(xCoord, yCoord, zCoord);
         packet.writeShort(heat);
         packet.writeShort(progress);

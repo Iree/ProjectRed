@@ -91,7 +91,10 @@ public abstract class RedstoneGatePart extends GatePart implements IFaceRedstone
             return i;
         
         BlockCoord pos = new BlockCoord(getTile()).offset(absDir);
-        return world().getIndirectPowerLevelTo(pos.x, pos.y, pos.z, absDir)*17;
+        if (world().isBlockNormalCube(pos.x, pos.y, pos.z))
+            return world().getBlockPowerInput(pos.x, pos.y, pos.z)*17;
+        
+        return 0;
     }
 
     public int calculateCornerSignal(int r) {

@@ -33,5 +33,4 @@ public class BackpackRecolouringRecipe extends ShapelessOreNBTRecipe {
         trueout.setTagCompound(out.getTagCompound());
         return trueout;
     }
-
 }
