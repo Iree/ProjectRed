@@ -96,31 +96,23 @@ public class ItemGemSaw extends ItemCraftingDamage implements Saw {
         public int getColorForStack(ItemStack saw) {
             EnumToolMaterial m = (((ItemGemSaw) saw.getItem()).tool.material);
             
-            if (m == EnumToolMaterial.WOOD) {
-                return PRColors.BROWN.hex;
-            }
-            if (m == EnumToolMaterial.STONE) {
-                return PRColors.LIGHT_GREY.hex;
-            }
-            if (m == EnumToolMaterial.IRON) {
-                return PRColors.WHITE.hex;
-            }
-            if (m == EnumToolMaterial.GOLD) {
-                return PRColors.YELLOW.hex;
-            }
-            if (m == ProjectRedExploration.toolMaterialRuby) {
-                return PRColors.RED.hex;
-            }
-            if (m == ProjectRedExploration.toolMaterialSapphire) {
-                return PRColors.BLUE.hex;
-            }
-            if (m == ProjectRedExploration.toolMaterialPeridot) {
-                return PRColors.GREEN.hex;
-            }
-            if (m == EnumToolMaterial.EMERALD) {
-                return PRColors.CYAN.hex;
-            }
-            return PRColors.BLACK.hex;
+            if (m == EnumToolMaterial.WOOD)
+                return PRColors.BROWN.rgb;
+            if (m == EnumToolMaterial.STONE)
+                return PRColors.LIGHT_GREY.rgb;
+            if (m == EnumToolMaterial.IRON)
+                return PRColors.WHITE.rgb;
+            if (m == EnumToolMaterial.GOLD)
+                return PRColors.YELLOW.rgb;
+            if (m == ProjectRedExploration.toolMaterialRuby)
+                return PRColors.RED.rgb;
+            if (m == ProjectRedExploration.toolMaterialSapphire)
+                return PRColors.BLUE.rgb;
+            if (m == ProjectRedExploration.toolMaterialPeridot)
+                return PRColors.GREEN.rgb;
+            if (m == EnumToolMaterial.EMERALD)
+                return PRColors.CYAN.rgb;
+            return PRColors.BLACK.rgb;
         }
 
         @Override
@@ -151,9 +143,8 @@ public class ItemGemSaw extends ItemCraftingDamage implements Saw {
             handle.render(t, null);
             holder.render(t, null);
             CCRenderState.draw();
-            if (type != ItemRenderType.EQUIPPED_FIRST_PERSON) {
+            if (type != ItemRenderType.EQUIPPED_FIRST_PERSON)
                 GL11.glDisable(GL11.GL_LIGHTING);
-            }
             GL11.glDisable(GL11.GL_CULL_FACE);
             CCRenderState.startDrawing(7);
             CCRenderState.setColourOpaque(getColorForStack(item));
@@ -161,9 +152,8 @@ public class ItemGemSaw extends ItemCraftingDamage implements Saw {
             CCRenderState.setColour(0xFFFFFFFF);
             CCRenderState.draw();
             GL11.glEnable(GL11.GL_CULL_FACE);
-            if (type != ItemRenderType.EQUIPPED_FIRST_PERSON) {
+            if (type != ItemRenderType.EQUIPPED_FIRST_PERSON)
                 GL11.glEnable(GL11.GL_LIGHTING);
-            }
         }
     }
 

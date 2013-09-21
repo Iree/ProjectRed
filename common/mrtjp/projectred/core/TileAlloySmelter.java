@@ -1,12 +1,11 @@
 package mrtjp.projectred.core;
 
-import java.util.Random;
-
 import mrtjp.projectred.ProjectRedCore;
 import mrtjp.projectred.core.BlockBasics.EnumBasics;
-import mrtjp.projectred.core.GuiRestrictedSlot.ISlotCheck;
+import mrtjp.projectred.core.GhostContainer.ISlotCheck;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
@@ -20,7 +19,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet132TileEntityData;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraftforge.common.ForgeDirection;
 import codechicken.lib.packet.PacketCustom;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
@@ -30,6 +28,8 @@ public class TileAlloySmelter extends TileBasicsBase implements IInventory {
 
     private SimpleInventory _inv = new SimpleInventory(11, "alloy", 64);
 
+    boolean updateNextTick;
+    
     // True when working on something
     public boolean hasWork = false;
 
@@ -43,11 +43,10 @@ public class TileAlloySmelter extends TileBasicsBase implements IInventory {
     public boolean queueWatcherUpdate = false;
     // Next tick, work will be rechecked.
     public boolean queueWorkUpdate = false;
-    // Cahce, used to avoid checking all recipes every tick.
+    // Cache, used to avoid checking all recipes every tick.
     public int burnTimeForRecipe = 0;
     
-    public TileAlloySmelter() {
-    }
+    public TileAlloySmelter() {}
 
     @Override
     public void onBlockBreak() {
@@ -98,6 +97,7 @@ public class TileAlloySmelter extends TileBasicsBase implements IInventory {
         _inv.writeToNBT(nbt);
         nbt.setInteger("heat", heat);
         nbt.setInteger("progress", progress);
+        nbt.setInteger("time", burnTimeForRecipe);
     }
 
     @Override
@@ -106,6 +106,7 @@ public class TileAlloySmelter extends TileBasicsBase implements IInventory {
         _inv.readFromNBT(nbt);
         heat = nbt.getInteger("heat");
         progress = nbt.getInteger("progress");
+        burnTimeForRecipe = nbt.getInteger("time");
         updateNextTick = true;
     }
 
@@ -244,40 +245,13 @@ public class TileAlloySmelter extends TileBasicsBase implements IInventory {
 
     @SideOnly(Side.CLIENT)
     private void spawnParticles() {
-        Random ran = new Random();
-        if (hasWork) {
-            worldObj.spawnParticle("smoke", (double) xCoord + .35f + ran.nextFloat() * 4.5F / 16.0F, (double) yCoord + 1, (double) zCoord + .35f + ran.nextFloat() * 4.5F / 16.0F, 0.0D, 0.0D, 0.0D);
-            worldObj.spawnParticle("flame", (double) xCoord + .35f + ran.nextFloat() * 4.5F / 16.0F, (double) yCoord + 1, (double) zCoord + .35f + ran.nextFloat() * 4.5F / 16.0F, 0.0D, 0.0D, 0.0D);
-        }
-        if (ran.nextFloat() > (hasWork ? .45f : .1f))
-            return;
-        int l = ForgeDirection.getOrientation(rotation).getOpposite().ordinal();
-        float f = (float) xCoord + 0.5F;
-        float f1 = (float) yCoord + 0.0F + ran.nextFloat() * 6.0F / 16.0F;
-        float f2 = (float) zCoord + 0.5F;
-        float f3 = 0.52F;
-        float f4 = ran.nextFloat() * 0.6F - 0.3F;
-
-        if (l == 4) {
-            worldObj.spawnParticle("smoke", (double) (f - f3), (double) f1, (double) (f2 + f4), 0.0D, 0.0D, 0.0D);
-            worldObj.spawnParticle("flame", (double) (f - f3), (double) f1, (double) (f2 + f4), 0.0D, 0.0D, 0.0D);
-        } else if (l == 5) {
-            worldObj.spawnParticle("smoke", (double) (f + f3), (double) f1, (double) (f2 + f4), 0.0D, 0.0D, 0.0D);
-            worldObj.spawnParticle("flame", (double) (f + f3), (double) f1, (double) (f2 + f4), 0.0D, 0.0D, 0.0D);
-        } else if (l == 2) {
-            worldObj.spawnParticle("smoke", (double) (f + f4), (double) f1, (double) (f2 - f3), 0.0D, 0.0D, 0.0D);
-            worldObj.spawnParticle("flame", (double) (f + f4), (double) f1, (double) (f2 - f3), 0.0D, 0.0D, 0.0D);
-        } else if (l == 3) {
-            worldObj.spawnParticle("smoke", (double) (f + f4), (double) f1, (double) (f2 + f3), 0.0D, 0.0D, 0.0D);
-            worldObj.spawnParticle("flame", (double) (f + f4), (double) f1, (double) (f2 + f3), 0.0D, 0.0D, 0.0D);
-        }
 
     }
 
     public void updateWatchers() {
         if (BasicUtils.isClient(worldObj))
             return;
-        PacketCustom packet = new PacketCustom(CoreCPH.channel, CoreCPH.alloySmelterWatcherUpdate);
+        PacketCustom packet = new PacketCustom(CoreSPH.channel, 3);
         packet.writeCoord(xCoord, yCoord, zCoord);
         packet.writeShort(heat);
         packet.writeShort(progress);
@@ -360,6 +334,8 @@ public class TileAlloySmelter extends TileBasicsBase implements IInventory {
                     return 150;
                 if (block.blockMaterial == Material.wood) 
                     return 300;
+                if (block == Block.coalBlock)
+                    return 16000;
             }
             if (item instanceof ItemTool && ((ItemTool) item).getToolMaterialName().equals("WOOD"))
                 return 200;
@@ -387,19 +363,10 @@ public class TileAlloySmelter extends TileBasicsBase implements IInventory {
     }
 
     @Override
-    public int getIconForSide(int side) {
-        if (side == 0 || side == 1)
-            return 0;
-        if (ForgeDirection.OPPOSITES[this.rotation] == side)
-            if (this.heat > 0)
-                return 3;
-            else
-                return 2;
-        return 1;
-    }
-
-    @Override
     public EnumBasics getType() {
         return EnumBasics.ALLOYSMELTER;
     }
+
+    @Override
+    public void onBlockPlacedBy(EntityLivingBase player, ItemStack item) {}
 }

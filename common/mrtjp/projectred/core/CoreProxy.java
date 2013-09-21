@@ -23,10 +23,11 @@ public class CoreProxy implements IProxy {
         itemWireDebugger = new ItemWireDebugger(Configurator.item_wireDebuggerID.getInt());
 
         blockMachines = new BlockBasics(Configurator.block_machinesID.getInt());
-        GameRegistry.registerBlock(blockMachines, ItemBlockBasics.class, "projectred.expansion.machines");
+        GameRegistry.registerBlock(blockMachines, ItemBlockBasics.class, "projectred.core.appliance");
+        
         for (EnumBasics m : EnumBasics.VALID_MACHINES)
-            GameRegistry.registerTileEntity(m.clazz, "tile.projectred.machines." + m.unlocalname);
-
+            GameRegistry.registerTileEntity(m.clazz, "tile.projectred.core.appliance|" + m.meta);
+        
         EnumPart.initOreDictDefinitions();
     }
 

@@ -1,7 +1,6 @@
 package mrtjp.projectred.core;
 
 import mrtjp.projectred.ProjectRedCore;
-import mrtjp.projectred.core.BlockBasics.EnumBasics;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
@@ -27,7 +26,7 @@ public class ItemBlockBasics extends ItemBlock {
 	 */
 	@Override
 	public String getUnlocalizedName(ItemStack itemstack) {
-		return getUnlocalizedName()+"."+EnumBasics.get(itemstack.getItemDamage()).unlocalname;
+		return getUnlocalizedName()+"|"+itemstack.getItemDamage();
 	}
 
 }

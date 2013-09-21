@@ -1,10 +1,11 @@
 package mrtjp.projectred;
 
+import codechicken.lib.packet.PacketCustom.CustomTinyPacketHandler;
 import mrtjp.projectred.core.Configurator;
 import mrtjp.projectred.core.IProxy;
-import mrtjp.projectred.illumination.EnumLantern;
+import mrtjp.projectred.illumination.BlockLamp;
+import mrtjp.projectred.illumination.ItemPartCageLamp;
 import mrtjp.projectred.illumination.ItemPartIllumarButton;
-import mrtjp.projectred.illumination.ItemPartLamp;
 import mrtjp.projectred.illumination.ItemPartLantern;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
@@ -18,15 +19,18 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
 
 @Mod(modid = "ProjRed|Illumination", name = "ProjectRed-Illumination", version = Configurator.version + "." + Configurator.buildnumber, acceptedMinecraftVersions = "[1.6.2]", dependencies = "required-after:ProjRed|Core;")
-@NetworkMod(clientSideRequired = true, serverSideRequired = true)
+@NetworkMod(clientSideRequired = true, serverSideRequired = true, tinyPacketHandler = CustomTinyPacketHandler.class)
 public class ProjectRedIllumination {
 
+    /** Blocks **/
+    public static BlockLamp blockLamp;
+    
     /** Multipart items **/
     public static ItemPartLantern itemPartLantern;
     public static ItemPartLantern itemPartInvLantern;
-    public static ItemPartLamp itemPartLamp;
-    public static ItemPartLamp itemPartInvLamp;
     public static ItemPartIllumarButton itemPartIllumarButton;
+    public static ItemPartCageLamp itemPartCageLamp;
+    public static ItemPartCageLamp itemPartInvCageLamp;
 
     @Instance("ProjRed|Illumination")
     public static ProjectRedIllumination instance;
@@ -37,7 +41,7 @@ public class ProjectRedIllumination {
     public static CreativeTabs tabLighting = new CreativeTabs("ill") {
         @Override
         public ItemStack getIconItemStack() {
-            return EnumLantern.RED.getInvertedItemStack();
+            return new ItemStack(ProjectRedIllumination.itemPartInvLantern, 1, 14);
         }
     };
 

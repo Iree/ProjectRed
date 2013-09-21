@@ -47,10 +47,15 @@ public class BlockBasics extends BlockContainer {
     public boolean hasTileEntity(int meta) {
         return true;
     }
+    
+    @Override
+    public boolean renderAsNormalBlock() {
+        return false;
+    }
 
     @Override
     public void breakBlock(World world, int x, int y, int z, int par5, int par6) {
-        TileBasicsBase tile = (TileBasicsBase) BasicUtils.getTileEntity(world, new BlockCoord(x, y, z), TileBasicsBase.class);
+        TileBasicsBase tile = BasicUtils.getTileEntity(world, new BlockCoord(x, y, z), TileBasicsBase.class);
         if (tile != null)
             tile.onBlockBreak();
         super.breakBlock(world, x, y, z, par5, par6);
@@ -59,14 +64,14 @@ public class BlockBasics extends BlockContainer {
 
     @Override
     public void onBlockClicked(World world, int x, int y, int z, EntityPlayer player) {
-        TileBasicsBase tile = (TileBasicsBase) BasicUtils.getTileEntity(world, new BlockCoord(x, y, z), TileBasicsBase.class);
+        TileBasicsBase tile = BasicUtils.getTileEntity(world, new BlockCoord(x, y, z), TileBasicsBase.class);
         if (tile != null)
             tile.onBlockClicked(player);
     }
 
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int par6, float par7, float par8, float par9) {
-        TileBasicsBase tile = (TileBasicsBase) BasicUtils.getTileEntity(world, new BlockCoord(x, y, z), TileBasicsBase.class);
+        TileBasicsBase tile = BasicUtils.getTileEntity(world, new BlockCoord(x, y, z), TileBasicsBase.class);
         if (tile != null)
             return tile.onBlockActivated(player);
         return false;
@@ -74,7 +79,7 @@ public class BlockBasics extends BlockContainer {
 
     @Override
     public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack itemstack) {
-        TileBasicsBase tile = (TileBasicsBase) BasicUtils.getTileEntity(world, new BlockCoord(x, y, z), TileBasicsBase.class);
+        TileBasicsBase tile = BasicUtils.getTileEntity(world, new BlockCoord(x, y, z), TileBasicsBase.class);
         if (tile != null)
             tile.onBlockPlacedBy(entity, itemstack);
     }
@@ -82,6 +87,11 @@ public class BlockBasics extends BlockContainer {
     @Override
     public final ArrayList<ItemStack> getBlockDropped(World world, int x, int y, int z, int metadata, int fortune) {
         return new ArrayList<ItemStack>();
+    }
+    
+    @Override
+    public boolean isOpaqueCube() {
+        return false;
     }
 
     @Override
@@ -102,52 +112,46 @@ public class BlockBasics extends BlockContainer {
     @SideOnly(Side.CLIENT)
     @Override
     public Icon getBlockTexture(IBlockAccess access, int x, int y, int z, int side) {
-        TileBasicsBase tile = (TileBasicsBase) BasicUtils.getTileEntity(access, new BlockCoord(x, y, z), TileBasicsBase.class);
+        TileBasicsBase tile = BasicUtils.getTileEntity(access, new BlockCoord(x, y, z), TileBasicsBase.class);
         if (tile != null)
-            return tile.getType().icons[tile.getIconForSide(side)];
+            return tile.getType().icons[0];
         return null;
     }
 
     @SideOnly(Side.CLIENT)
     @Override
     public Icon getIcon(int side, int meta) {
-        return EnumBasics.get(meta).icons[EnumBasics.get(meta).textProvider.getIconIndex(side)];
+        return EnumBasics.get(meta).icons[0];
     }
 
     @Override
     public int getLightValue(IBlockAccess world, int x, int y, int z) {
-        TileBasicsBase tile = (TileBasicsBase) BasicUtils.getTileEntity(world, new BlockCoord(x, y, z), TileBasicsBase.class);
+        TileBasicsBase tile = BasicUtils.getTileEntity(world, new BlockCoord(x, y, z), TileBasicsBase.class);
         if (tile != null)
             return tile.getLightLevel();
         return 0;
     }
+    
+    public int getRenderType() {
+        return CoreClientProxy.basicRenderID;
+    }
+
 
     public enum EnumBasics {
-        ALLOYSMELTER("Alloy Smelter", "machinealloy", TileAlloySmelter.class, new IIconIndexer() {
-            @Override
-            public int getIconIndex(int side) {
-                return side == 0 || side == 1 ? 0 : side == 3 ? 2 : 1;
-            }
-        }, "smeltertop", "smelterside", "smelterfront", "smelterfronton");
+        ALLOYSMELTER(TileAlloySmelter.class, "presser");
 
         public static final EnumBasics[] VALID_MACHINES = { ALLOYSMELTER };
 
-        public String fullname;
-        public String unlocalname;
         public Class<? extends TileBasicsBase> clazz;
         public int meta = this.ordinal();
 
         public String[] iconPath = new String[6];
         public Icon[] icons;
 
-        public IIconIndexer textProvider;
 
-        private EnumBasics(String name, String unlocal, Class<? extends TileBasicsBase> tile, IIconIndexer p, String... sides) {
-            fullname = name;
-            unlocalname = unlocal;
+        private EnumBasics(Class<? extends TileBasicsBase> tile, String... sides) {
             clazz = tile;
             iconPath = sides;
-            textProvider = p;
         }
 
         public static EnumBasics get(int ordinal) {
@@ -162,10 +166,6 @@ public class BlockBasics extends BlockContainer {
 
         public ItemStack getItemStack(int i) {
             return new ItemStack(ProjectRedCore.blockMachines, i, meta);
-        }
-
-        interface IIconIndexer {
-            public int getIconIndex(int side);
         }
     }
 }

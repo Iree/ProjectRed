@@ -4,11 +4,8 @@ import codechicken.lib.vec.BlockCoord;
 import codechicken.lib.vec.Rotation;
 
 public class RedAlloyWirePart extends RedwirePart {
-    public RedAlloyWirePart(int side) {
-        super(side);
-    }
 
-    @Override
+	@Override
     public String getType() {
         return "pr_redwire";
     }
@@ -34,6 +31,13 @@ public class RedAlloyWirePart extends RedwirePart {
     @Override
     public int redstoneConductionMap() {
         return 0x1F;
+    }
+    
+    @Override
+    public void onRemoved() {
+        super.onRemoved();
+        if(!world().isRemote)
+            tile().notifyNeighborChange(side);
     }
 
     @Override
